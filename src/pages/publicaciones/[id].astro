@@ -1,0 +1,141 @@
+---
+import BaseLayout from "../../layouts/Layout.astro";
+
+import Navbar from "../../components/navbar/navbar.astro";
+import PublicacionCard from "../../components/publicaciones/publicaciones.astro";
+
+import { getUser } from "../../lib/auth-server";
+import { getPerfil } from "../../lib/perfil-server";
+
+import {
+  getPublicacion
+} from "../../lib/publicaciones-server";
+import "../../styles/global.css";
+
+const token = Astro.cookies.get("token")?.value;
+
+if (!token) {
+  throw Astro.redirect("/login");
+}
+
+const { id } = Astro.params;
+
+let publicacion = null;
+let perfil = null;
+let user = null;
+
+try {
+
+  user = await getUser(token);
+
+  perfil = await getPerfil(token);
+
+  publicacion = await getPublicacion(
+    token,
+    id
+  );
+
+} catch (error) {
+
+  console.error(error);
+
+  throw Astro.redirect("/dashboard");
+}
+
+if (!publicacion) {
+  throw Astro.redirect("/dashboard");
+}
+---
+
+<BaseLayout>
+
+  <Navbar {...perfil} />
+
+  <div class="dashboard-container">
+
+    <main class="main-content">
+
+      <div class="detalle-publicacion">
+
+        <div class="volver-container">
+
+          <a
+            href="/dashboard"
+            class="btn-volver"
+          >
+            ← Volver
+          </a>
+
+        </div>
+
+        <div
+          class="publicacion-wrapper"
+          data-wrapper-id={publicacion.id}
+        >
+
+          <PublicacionCard
+            {...publicacion}
+          />
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</BaseLayout>
+
+<style>
+
+  .detalle-publicacion {
+
+    width: 100%;
+
+    max-width: 800px;
+
+    margin: 0 auto;
+
+    padding: 20px;
+  }
+
+  .volver-container {
+
+    margin-bottom: 20px;
+  }
+
+  .btn-volver {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    text-decoration: none;
+
+    padding: 10px 16px;
+
+    border-radius: 10px;
+
+    background: #f3f3f3;
+
+    color: #111;
+
+    font-weight: 600;
+
+    transition: .2s ease;
+  }
+
+  .btn-volver:hover {
+
+    background: #ddd;
+  }
+
+  .publicacion-wrapper {
+
+    position: relative;
+  }
+
+</style>

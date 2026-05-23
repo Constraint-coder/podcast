@@ -1,0 +1,508 @@
+---
+import BaseLayout from "../layouts/Layout.astro";
+import { getUser } from "../lib/auth-server";
+import { getPublicaciones } from "../lib/publicaciones-server";
+
+import PublicacionCard from "../components/publicaciones/publicaciones.astro";
+import CrearPublicacion from "../components/publicaciones/crearpublicaciones.astro";
+import Navbar from "@/components/navbar/navbar.astro";
+import Sidebar from "@/components/Sidebar.astro";
+
+import "../styles/global.css";
+
+const token = Astro.cookies.get("token")?.value;
+if (!token) {
+  
+return;
+   
+}
+
+const page = Number(
+  Astro.url.searchParams.get("page") || 1
+);
+
+let initialData;
+let user = null;
+
+try {
+
+  initialData =
+    await getPublicaciones(token, page);
+
+  user = await getUser(token);
+
+} catch (error) {
+  console.error(error);
+}
+---
+
+<BaseLayout>
+
+  <!-- NAVBAR -->
+  <div class="navbar-fixed">
+    <Navbar {...user} />
+  </div>
+    <aside class="sidebar-area">
+      <Sidebar />
+    </aside>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard-layout">
+
+    <!-- SIDEBAR -->
+
+    <!-- CONTENIDO -->
+    <main class="main-content">
+
+      <section class="crear-publicacion-card">
+
+        <div class="section-header">
+          <h2>Crear publicación</h2>
+         
+        </div>
+
+        <CrearPublicacion />
+
+      </section>
+
+      <!-- FEED -->
+      <section class="feed-section">
+
+        <div class="section-header">
+          <h2>Feed de publicaciones</h2>
+
+          <span>
+            {initialData.total}
+            publicaciones encontradas
+          </span>
+        </div>
+
+        <div class="feed">
+
+          {Array.isArray(initialData.data) &&
+          initialData.data.length > 0 ? (
+
+            initialData.data.map((pub) => (
+
+              <div
+                class="publicacion-wrapper"
+                data-wrapper-id={pub.id}
+              >
+                <PublicacionCard {...pub} />
+              </div>
+
+            ))
+
+          ) : (
+
+            <div class="empty-feed">
+
+              <h3>
+                No hay publicaciones aún
+              </h3>
+
+              <p>
+                Sé el primero en publicar algo.
+              </p>
+
+            </div>
+
+          )}
+
+        </div>
+
+        <!-- PAGINACION -->
+        <div class="paginacion">
+
+          {initialData.current_page > 1 && (
+            <a
+              class="btn-pag"
+              href={`?page=${initialData.current_page - 1}`}
+            >
+              ← Anterior
+            </a>
+          )}
+
+          <span class="info-pag">
+            Página
+            {initialData.current_page}
+            de
+            {initialData.last_page}
+          </span>
+
+          {initialData.current_page <
+            initialData.last_page && (
+            <a
+              class="btn-pag"
+              href={`?page=${initialData.current_page + 1}`}
+            >
+              Siguiente →
+            </a>
+          )}
+
+        </div>
+
+      </section>
+      
+
+    </main>
+
+  </div>
+
+<section class="seccion-lateral">
+<h1> aqui va el chat bot</h1>
+<h1> aqui va el chat bot</h1>
+<h1> aqui va el chat bot</h1>
+<h1> aqui va el chat bot</h1>
+</section>
+
+</BaseLayout>
+
+<style>
+
+:root{
+
+  --primary:#2563eb;
+
+  --secondary:#7c3aed;
+
+  --dark:#0f172a;
+
+  --text:#334155;
+
+  --muted:#64748b;
+
+  --border:#e2e8f0;
+
+  --bg:#f1f5f9;
+
+  --white:#ffffff;
+}
+
+/* FONDO */
+
+body{
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc 0%,
+      #eef2ff 100%
+    );
+
+  min-height:100vh;
+}
+
+/* NAVBAR */
+
+.navbar-fixed{
+
+  position:fixed;
+
+  top:0;
+
+  z-index:999;
+
+  width:100%;
+  height: 40px;
+
+  backdrop-filter:blur(16px);
+
+  background:
+    rgba(255,255,255,.78);
+
+  border-bottom:
+    1px solid rgba(226,232,240,.8);
+}
+
+/* LAYOUT */
+
+.dashboard-layout{
+
+  display:grid;
+
+  grid-template-columns:
+  100%
+  2fr
+  ;
+
+  gap:2rem;
+
+  width:55%;
+
+  max-width:1400px;
+
+  margin:auto;
+
+  padding:
+    2rem
+    1.5rem;
+
+  align-items:start;
+}
+
+/* SIDEBAR */
+
+.sidebar-area{
+
+  position:fixed;
+  width: 20%;
+margin:auto;
+  top:90px;
+
+  height:fit-content;
+
+  background:
+    rgba(255,255,255,.7);
+
+  backdrop-filter:blur(18px);
+
+  border:
+    1px solid rgba(255,255,255,.5);
+
+  border-radius:28px;
+
+  padding:1.2rem;
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,.06);
+}
+
+/* MAIN */
+
+.main-content{
+
+  width:100%;
+}
+
+/* HERO */
+
+
+
+
+
+
+
+
+/* SECCIONES */
+
+.crear-publicacion-card,
+.feed-section{
+
+  background:
+    rgba(255,255,255,.78);
+
+  backdrop-filter:blur(18px);
+
+  border:
+    1px solid rgba(255,255,255,.5);
+
+  border-radius:28px;
+
+  padding:2.6rem;
+
+  margin-bottom:1.8rem;
+  margin-top: 10px;
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,.05);
+    
+}
+
+/* HEADER SECCIONES */
+
+.section-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:1rem;
+
+  flex-wrap:wrap;
+
+  margin-bottom:1.4rem;
+  align-items: center;
+}
+
+.section-header h2{
+
+  margin:0;
+
+  font-size:2.35rem;
+
+  color:var(--dark);
+
+  font-weight:800;
+  text-align: center;
+
+}
+
+
+/* FEED */
+
+.feed{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:1.2rem;
+}
+
+.publicacion-wrapper{
+
+  animation:
+    fadeIn .35s ease;
+}
+.seccion-lateral{
+  top: 180px;
+  position: fixed;
+  width:20%;
+  display: grid;
+  flex-direction: column ;
+  margin: auto;
+  border:#0f172a solid 2px;
+  right: 1px;
+}
+@keyframes fadeIn{
+
+  from{
+
+    opacity:0;
+
+    transform:
+      translateY(10px);
+  }
+
+  to{
+
+    opacity:1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* EMPTY */
+
+.empty-feed{
+
+  text-align:center;
+
+  padding:4rem 1rem;
+}
+
+.empty-feed h3{
+
+  margin-bottom:.5rem;
+
+  color:var(--dark);
+}
+
+.empty-feed p{
+
+  color:var(--muted);
+}
+
+/* PAGINACION */
+
+.paginacion{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:1rem;
+
+  flex-wrap:wrap;
+
+  margin-top:2rem;
+}
+
+.btn-pag{
+
+  padding:
+    .9rem
+    1.3rem;
+
+  border-radius:16px;
+
+  text-decoration:none;
+
+  color:white;
+
+  font-weight:700;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--secondary)
+    );
+
+  box-shadow:
+    0 10px 25px rgba(37,99,235,.2);
+
+  transition:.25s ease;
+}
+
+.btn-pag:hover{
+
+  transform:
+    translateY(-3px);
+
+  box-shadow:
+    0 18px 30px rgba(37,99,235,.3);
+}
+
+.info-pag{
+
+  color:var(--muted);
+
+  font-weight:600;
+}
+
+/* RESPONSIVE */
+
+@media (max-width:1100px){
+
+  .dashboard-layout{
+
+    grid-template-columns:1fr;
+  }
+
+  .sidebar-area{
+
+    position:relative;
+
+    top:0;
+  }
+}
+
+@media (max-width:768px){
+
+  .dashboard-layout{
+
+    padding:1rem;
+  }
+
+
+
+  .crear-publicacion-card,
+  .feed-section{
+
+    padding:1.2rem;
+  }
+
+  .section-header{
+
+    align-items:flex-start;
+  }
+}
+
+</style>

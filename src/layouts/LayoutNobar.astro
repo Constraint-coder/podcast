@@ -1,0 +1,30 @@
+---
+import Sidebar from "../components/Sidebar.astro";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MiApp</title>
+  </head>
+  <body>
+    <div class="app-layout">
+
+      <main class="app-content">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .app-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+</style>

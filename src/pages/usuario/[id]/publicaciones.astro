@@ -1,0 +1,206 @@
+---
+import BaseLayout
+from "../../../layouts/Layout.astro";
+
+import Navbar
+from "../../../components/navbar/navbar.astro";
+
+import PublicacionCard
+from "../../../components/publicaciones/publicaciones.astro";
+
+import Editarpublicaciones
+from "@/components/publicaciones/editarpublicaciones.astro";
+
+import {
+  getPerfilPorId
+} from "../../../lib/perfil-server";
+
+import {
+  getPublicacionesPorAutor
+} from "../../../lib/publicaciones-server";
+
+import {
+  getUser
+} from "../../../lib/auth-server";
+
+import "../../../styles/global.css";
+
+const token =
+  Astro.cookies.get("token")?.value;
+
+if (!token) {
+  throw Astro.redirect("/login");
+}
+
+const { id } = Astro.params;
+
+let perfil = null;
+let publicaciones = [];
+let authUser = null;
+
+try {
+
+  authUser =
+    await getUser(token);
+
+  perfil =
+    await getPerfilPorId(
+      token,
+      id
+    );
+
+  publicaciones =
+    await getPublicacionesPorAutor(
+      token,
+      id
+    );
+
+} catch (error) {
+
+  console.error(error);
+
+  throw Astro.redirect(
+    "/dashboard"
+  );
+}
+
+/* =========================
+   ES MI PERFIL
+========================= */
+
+const esMiPerfil =
+  Number(authUser?.id)
+  === Number(id);
+---
+
+<BaseLayout>
+
+  <Navbar {...perfil} />
+
+  <div class="autor-layout">
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <header class="autor-header">
+
+      <div class="autor-info">
+
+        <div class="avatar">
+
+          {
+            perfil?.foto_perfil
+              ? (
+                <img
+                  src={`http://127.0.0.1:8000/storage/${perfil.foto_perfil}`}
+                  alt={perfil.nombre}
+                />
+              )
+              : (
+                <div class="avatar-fallback">
+
+                  {
+                    perfil?.nombre?.charAt(0)
+                    ?? "?"
+                  }
+
+                  {
+                    perfil?.apellido?.charAt(0)
+                    ?? ""
+                  }
+
+                </div>
+              )
+          }
+
+        </div>
+
+        <div>
+
+          <h1>
+            {perfil.nombre}
+            {" "}
+            {perfil.apellido}
+          </h1>
+
+          <p class="email">
+            {perfil.email}
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="autor-actions">
+
+        <a
+          class="btn"
+          href={`/usuario/${id}`}
+        >
+          👤 Ver perfil
+        </a>
+
+        <a
+          class="btn secondary"
+          href="/dashboard"
+        >
+          ← Volver
+        </a>
+
+      </div>
+
+    </header>
+
+    <!-- ========================= -->
+    <!-- PUBLICACIONES -->
+    <!-- ========================= -->
+
+    <main class="publicaciones-grid">
+
+      {
+        Array.isArray(publicaciones)
+        && publicaciones.length > 0
+          ? publicaciones.map((pub) => (
+
+            <div
+              class="publicacion-wrapper"
+              data-wrapper-id={pub.id}
+            >
+
+              {
+                esMiPerfil && (
+                  <Editarpublicaciones
+                    {...pub}
+                  />
+                )
+              }
+
+              <PublicacionCard
+                {...pub}
+              />
+
+            </div>
+
+          ))
+          : (
+            <div class="empty">
+
+              <h2>
+                Sin publicaciones
+              </h2>
+
+              <p>
+                Este usuario aún no ha publicado contenido.
+              </p>
+
+            </div>
+          )
+      }
+
+    </main>
+
+  </div>
+
+</BaseLayout>
+

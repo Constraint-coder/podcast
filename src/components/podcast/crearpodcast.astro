@@ -1,0 +1,50 @@
+---
+---
+
+        <form id="publicarForm">
+          <input type="text" id="titulo" name="titulo" placeholder="Título (opcional)"
+          >
+          
+          <textarea 
+            id="contenido"
+            name="contenido"
+            placeholder="¿Qué estás pensando?"
+            rows="5"
+            required
+          ></textarea>
+          
+          <input 
+            type="text" 
+            id="imagen_url" 
+            name="imagen_url" 
+            placeholder="URL de imagen (opcional)"
+          >
+          
+          <div class="radio-group">
+            <label class="radio-label">Visibilidad:</label>
+            <div class="radio-options">
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  name="es_publica" 
+                  value="true" 
+                  id="publico"
+                  checked
+                >
+                <span>🌍 Público</span>
+              </label>
+              
+              <label class="radio-option">
+                <input 
+                  type="radio" 
+                  name="es_publica" 
+                  value="false" 
+                  id="privado"
+                >
+                <span>🔒 Privado</span>
+              </label>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn-publicar">Publicar</button>
+        </form>

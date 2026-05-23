@@ -1,0 +1,41 @@
+---
+import BaseLayout from "../../layouts/LayoutNobar.astro";
+import ProfileCard from "../../components/usuarios/usuarios.astro";
+import { getPerfil } from "../../lib/perfil-server";
+
+import "../../styles/global.css";
+import "../../styles/curriculum.css";
+
+const token = Astro.cookies.get("token")?.value;
+if (!token) return Astro.redirect("/login");
+
+
+
+let perfil;
+
+try {
+  perfil = await getPerfil(token);
+} catch (error) { 
+  console.error(error);
+ return Astro.redirect("/dashboard");
+}
+---  
+<BaseLayout>
+  <div style="flex-direction: column;">
+
+  <ProfileCard perfil={perfil} />
+    <a style="margin: 40px;" href="/editarperfil">Editar perfil</a>
+    <button id="logoutBtn" class="btn btn--danger">volver</button>
+</div>
+<script>
+  import { logout } from "@/lib/auth";
+    document.getElementById("logoutBtn")?.addEventListener("click", async () => {
+    try { await logout() } catch (e) { console.error(e); }
+    document.cookie = "token=; path=/; max-age=0";
+    window.location.href = "/login";
+  });
+</script>
+<style>
+  .btn--danger { background: #dc2626; color: white; border-color: transparent; }
+</style>
+</BaseLayout>

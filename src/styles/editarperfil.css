@@ -1,0 +1,339 @@
+ 
+    .editar-perfil-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .btn-logout {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-logout:hover {
+      background: #c82333;
+    }
+
+    .seccion-editar {
+      margin-bottom: 3rem;
+    }
+
+    .foto-perfil-section {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+
+    .foto-perfil-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid #007bff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .foto-perfil-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .foto-perfil-preview .no-foto {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      color: #999;
+    }
+
+    .foto-perfil-preview .no-foto svg {
+      margin-bottom: 0.5rem;
+    }
+
+    .foto-perfil-preview .no-foto span {
+      font-size: 0.8rem;
+    }
+
+    .foto-perfil-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+    }
+
+    .text-muted {
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    hr {
+      border: none;
+      border-top: 2px solid #e0e0e0;
+      margin: 3rem 0;
+    }
+
+    .lista-items {
+      margin-bottom: 2rem;
+    }
+
+    .no-items {
+      color: #999;
+      font-style: italic;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+
+    .item-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      transition: all 0.3s;
+    }
+
+    .item-card:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-color: #007bff;
+    }
+
+    .item-content {
+      flex: 1;
+    }
+
+    .item-content strong {
+      display: block;
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .item-content p {
+      margin: 0.3rem 0;
+      color: #666;
+    }
+
+    .descripcion {
+      font-size: 0.9rem;
+      color: #777;
+      margin-top: 0.5rem;
+    }
+
+    .fecha {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+
+    .fecha.expira {
+      color: #dc3545;
+      margin-left: 1rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-left: 0.5rem;
+    }
+
+    .link-proyecto {
+      display: inline-block;
+      color: #007bff;
+      text-decoration: none;
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .link-proyecto:hover {
+      text-decoration: underline;
+    }
+
+    .habilidades-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .item-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #007bff;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .btn-tag-delete {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+    }
+
+    .btn-tag-delete:hover {
+      opacity: 0.7;
+    }
+
+    .btn-delete {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .btn-delete:hover {
+      background: #c82333;
+    }
+
+    .form-add {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 2px dashed #dee2e6;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="url"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .error {
+      color: #dc3545;
+      margin-top: 0.5rem;
+    }
+
+    .success {
+      color: #28a745;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .header-actions {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .item-card {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .foto-perfil-section {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .foto-perfil-preview {
+        margin: 0 auto;
+      }
+
+      .foto-perfil-controls {
+        align-items: center;
+      }
+    }

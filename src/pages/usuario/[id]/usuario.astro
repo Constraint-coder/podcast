@@ -1,0 +1,45 @@
+---
+import BaseLayout from "../../../layouts/Layout.astro";
+
+import ProfileCard
+from "../../../components/usuarios/usuarios.astro";
+
+import { getPerfilPorId }
+from "../../../lib/perfil-server";
+
+import "../../../styles/global.css";
+import "../../../styles/curriculum.css";
+
+const token =
+  Astro.cookies.get("token")?.value;
+
+const { id } = Astro.params;
+
+let perfil = null;
+
+try {
+
+  perfil =
+    await getPerfilPorId(
+      token,
+      id
+    );
+
+} catch (error) {
+
+  console.error(error);
+
+  return Astro.redirect(
+    "/dashboard"
+  );
+}
+---
+
+<BaseLayout>
+
+  <ProfileCard
+    perfil={perfil}
+    userId={id}
+  />
+
+</BaseLayout>

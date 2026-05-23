@@ -1,0 +1,689 @@
+---
+import BaseLayout from "../layouts/LayoutNobar.astro";
+import { getUser } from "../lib/auth-server";
+import { getPerfil } from "../lib/perfil-server";
+import { getIdiomas } from "../lib/idioma-server";
+import { getExperiencias } from "../lib/experiencias-server";
+import { getEducacion } from "../lib/educacion-server";
+import { getHabilidades } from "../lib/habilidades-server";
+import { getProyectos } from "../lib/proyectos-server";
+import { getCertificaciones } from "../lib/certificaciones-server";
+
+const token = Astro.cookies.get("token")?.value;
+
+
+const user = await getUser(token);
+const perfil = await getPerfil(token);
+
+let idiomas = [];
+let experiencias = [];
+let educacion = [];
+let habilidades = [];
+let proyectos = [];
+let certificaciones = [];
+
+if (perfil?.id) {
+  try {
+    idiomas = await getIdiomas(token, perfil.id);
+
+    experiencias = await getExperiencias(token);
+    educacion = await getEducacion(token);
+    habilidades = await getHabilidades(token, perfil.id);
+    proyectos = await getProyectos(token, perfil.id);
+    certificaciones = await getCertificaciones(token, perfil.id);
+  } catch (error) {
+    console.error("Error al cargar datos:", error);
+  }
+}
+---
+
+<BaseLayout>
+<div class="page">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <p class="topbar__sub">Panel de perfil</p>
+      <h1 class="topbar__title">Editar Perfil</h1>
+    </div>
+    <a href="usuario/meperfil" id="logoutBtn" class="btn btn--danger">volver</a>
+  </header>
+
+  <!-- INFORMACIÓN PERSONAL -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Información personal</h2>
+      <span class="badge">ID: {user.id}</span>
+    </div>
+
+    <div class="foto-row">
+      <div class="foto-circle">
+        {perfil?.foto_perfil ? (
+          <img id="preview-foto" src={`http://127.0.0.1:8000/storage/${perfil.foto_perfil}`} alt="Foto de perfil" />
+        ) : (
+          <div id="preview-foto" class="foto-circle__placeholder">
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="3.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12.25 19.25H6.95C5.77 19.25 4.89 18.21 5.49 17.2C6.36 15.72 8.24 14 12.25 14C16.26 14 18.14 15.72 19.01 17.2C19.61 18.21 18.73 19.25 17.55 19.25H16.75"/>
+            </svg>
+            <span>Sin foto</span>
+          </div>
+        )}
+      </div>
+      <div class="foto-actions">
+        <input type="file" id="input-foto" accept="image/*" hidden />
+        <button type="button" id="btn-seleccionar-foto" class="btn btn--outline">Cambiar foto</button>
+        <small class="hint">PNG, JPG o WEBP · máx 5MB</small>
+      </div>
+    </div>
+
+    <form id="perfilForm">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label for="titulo">Título profesional</label>
+          <input id="titulo" name="titulo" type="text" placeholder="Ej: Desarrollador Full Stack" value={perfil?.titulo || ""} />
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" name="telefono" type="text" placeholder="+52 123 456 7890" value={perfil?.telefono || ""} />
+        </div>
+      </div>
+      <div class="field">
+        <label for="sobre_mi">Sobre mí</label>
+        <textarea id="sobre_mi" name="sobre_mi" rows="4" placeholder="Cuéntanos sobre ti...">{perfil?.sobre_mi || ""}</textarea>
+      </div>
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label for="ubicacion">Ubicación</label>
+          <input id="ubicacion" name="ubicacion" type="text" placeholder="Ej: Ciudad de México" value={perfil?.ubicacion || ""} />
+        </div>
+        <div class="field">
+          <label for="fecha_nacimiento">Fecha de nacimiento</label>
+          <input id="fecha_nacimiento" name="fecha_nacimiento" type="date" value={perfil?.fecha_nacimiento || ""} />
+        </div>
+      </div>
+      <div class="form-grid form-grid--3">
+        <div class="field">
+          <label for="url_sitio_web">Sitio web</label>
+          <input id="url_sitio_web" name="url_sitio_web" type="url" placeholder="https://mi-sitio.com" value={perfil?.url_sitio_web || ""} />
+        </div>
+        <div class="field">
+          <label for="url_linkedin">LinkedIn</label>
+          <input id="url_linkedin" name="url_linkedin" type="url" placeholder="https://linkedin.com/in/..." value={perfil?.url_linkedin || ""} />
+        </div>
+        <div class="field">
+          <label for="url_github">GitHub</label>
+          <input id="url_github" name="url_github" type="url" placeholder="https://github.com/..." value={perfil?.url_github || ""} />
+        </div>
+      </div>
+      <div class="form-footer">
+        <p id="error-perfil" class="msg msg--error"></p>
+        <p id="success-perfil" class="msg msg--success"></p>
+        <button type="submit" class="btn btn--primary">Guardar cambios</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- EXPERIENCIA -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Experiencia laboral</h2>
+    </div>
+    <form class="form-add" data-type="experiencia">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Empresa</label>
+          <input name="nombre_empresa" placeholder="Empresa" required />
+        </div>
+        <div class="field">
+          <label>Puesto</label>
+          <input name="descripcion_puesto" placeholder="Puesto o cargo" required />
+        </div>
+      </div>
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Fecha inicio</label>
+          <input type="date" name="fecha_inicio" />
+        </div>
+        <div class="field">
+          <label>Fecha fin</label>
+          <input type="date" name="fecha_fin" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Dirección</label>
+        <input name="direccion" placeholder="Ciudad, País" />
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar experiencia</button>
+    </form>
+    <div id="lista-experiencia" class="item-list">
+      {experiencias.length === 0 ? (
+        <p class="empty">No tienes experiencias registradas.</p>
+      ) : (
+        experiencias.map((exp) => (
+          <div class="item-card" data-id={exp.id}>
+            <div class="item-card__info">
+              <h3>{exp.descripcion_puesto}</h3>
+              <p>{exp.nombre_empresa}</p>
+              {exp.direccion && <p>{exp.direccion}</p>}
+              <small>{exp.fecha_inicio} — {exp.fecha_fin || "Actualidad"}</small>
+            </div>
+            <button class="btn btn--ghost-danger btn-delete" data-type="experiencia" data-id={exp.id}>
+              Eliminar
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+  <!-- EDUCACIÓN -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Educación</h2>
+    </div>
+    <form class="form-add" data-type="educacion">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Título</label>
+          <input name="titulo" placeholder="Ej: Ingeniería en Sistemas" required />
+        </div>
+        <div class="field">
+          <label>Institución</label>
+          <input name="nombre_institucion" placeholder="Nombre de la institución" required />
+        </div>
+      </div>
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Fecha inicio</label>
+          <input type="date" name="fecha_inicio" />
+        </div>
+        <div class="field">
+          <label>Fecha fin</label>
+          <input type="date" name="fecha_fin" />
+        </div>
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar educación</button>
+    </form>
+    <div id="lista-educacion" class="item-list">
+      {educacion.length === 0 ? (
+        <p class="empty">No tienes educación registrada.</p>
+      ) : (
+        educacion.map((edu) => (
+          <div class="item-card" data-id={edu.id}>
+            <div class="item-card__info">
+              <h3>{edu.titulo}</h3>
+              <p>{edu.nombre_institucion}</p>
+              <small>{edu.fecha_inicio} — {edu.fecha_fin || "Actualidad"}</small>
+            </div>
+            <button class="btn btn--ghost-danger btn-delete" data-type="educacion" data-id={edu.id}>
+              Eliminar
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+  <!-- HABILIDADES -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Habilidades</h2>
+    </div>
+    <form class="form-add" data-type="habilidad">
+      <div class="field">
+        <label>Habilidad</label>
+        <input name="habilidad" placeholder="Ej: JavaScript" required />
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar habilidad</button>
+    </form>
+    <div id="lista-habilidad" class="item-list tags-list">
+      {habilidades.length === 0 ? (
+        <p class="empty">No tienes habilidades registradas.</p>
+      ) : (
+        habilidades.map((hab) => (
+          <div class="item-tag" data-id={hab.id}>
+            <span>{hab.habilidad}</span>
+            <button class="btn-tag-delete btn-delete" data-type="habilidad" data-id={hab.id}>✕</button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+  <!-- PROYECTOS -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Proyectos</h2>
+    </div>
+    <form class="form-add" data-type="proyecto">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Nombre</label>
+          <input name="proyecto" placeholder="Nombre del proyecto" required />
+        </div>
+        <div class="field">
+          <label>URL</label>
+          <input type="url" name="url_proyecto" placeholder="https://..." />
+        </div>
+      </div>
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Fecha inicio</label>
+          <input type="date" name="fecha_inicio" />
+        </div>
+        <div class="field">
+          <label>Fecha fin</label>
+          <input type="date" name="fecha_fin" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Descripción</label>
+        <textarea name="descripcion" rows="3"></textarea>
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar proyecto</button>
+    </form>
+    <div id="lista-proyecto" class="item-list">
+      {proyectos.length === 0 ? (
+        <p class="empty">No tienes proyectos registrados.</p>
+      ) : (
+        proyectos.map((proy) => (
+          <div class="item-card" data-id={proy.id}>
+            <div class="item-card__info">
+              <h3>{proy.proyecto}</h3>
+              {proy.descripcion && <p class="item-card__desc">{proy.descripcion}</p>}
+              {proy.url_proyecto && (
+                <a href={proy.url_proyecto} target="_blank" rel="noopener" class="item-card__link">
+                  Ver proyecto →
+                </a>
+              )}
+              {proy.fecha_inicio && (
+                <small>{proy.fecha_inicio} — {proy.fecha_fin || "En curso"}</small>
+              )}
+            </div>
+            <button class="btn btn--ghost-danger btn-delete" data-type="proyecto" data-id={proy.id}>
+              Eliminar
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+  <!-- CERTIFICACIONES -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Certificaciones</h2>
+    </div>
+    <form class="form-add" data-type="certificacion">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Certificación</label>
+          <input name="certificacion" placeholder="Nombre de la certificación" required />
+        </div>
+        <div class="field">
+          <label>Organización</label>
+          <input name="organizacion" placeholder="Organización emisora" />
+        </div>
+      </div>
+      <div class="field">
+        <label>Fecha de emisión</label>
+        <input type="date" name="fecha_emision" />
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar certificación</button>
+    </form>
+    <div id="lista-certificacion" class="item-list">
+      {certificaciones.length === 0 ? (
+        <p class="empty">No tienes certificaciones registradas.</p>
+      ) : (
+        certificaciones.map((cert) => (
+          <div class="item-card" data-id={cert.id}>
+            <div class="item-card__info">
+              <h3>{cert.certificacion}</h3>
+              {cert.organizacion && <p>{cert.organizacion}</p>}
+              {cert.fecha_emision && <small>Emitida: {cert.fecha_emision}</small>}
+            </div>
+            <button class="btn btn--ghost-danger btn-delete" data-type="certificacion" data-id={cert.id}>
+              Eliminar
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+  <!-- IDIOMAS -->
+  <section class="card">
+    <div class="card__header">
+      <h2 class="card__title">Idiomas</h2>
+    </div>
+    <form class="form-add" data-type="idioma">
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label>Idioma</label>
+          <input name="idioma" placeholder="Ej: Inglés" required />
+        </div>
+        <div class="field">
+          <label>Nivel</label>
+          <input name="nivel" placeholder="Básico, Intermedio, Avanzado..." />
+        </div>
+      </div>
+      <input type="hidden" name="perfil_id" value={perfil?.id} />
+      <button type="submit" class="btn btn--primary">Agregar idioma</button>
+    </form>
+    <div id="lista-idioma" class="item-list">
+      {idiomas.length === 0 ? (
+        <p class="empty">No tienes idiomas registrados.</p>
+      ) : (
+        idiomas.map((idioma) => (
+          <div class="item-card" data-id={idioma.id}>
+            <div class="item-card__info">
+              <h3>{idioma.idioma}</h3>
+              {idioma.nivel && <span class="nivel-badge">{idioma.nivel}</span>}
+            </div>
+            <button class="btn btn--ghost-danger btn-delete" data-type="idioma" data-id={idioma.id}>
+              Eliminar
+            </button>
+          </div>
+        ))
+      )}
+    </div>
+  </section>
+
+</div>
+
+<div data-id-perfil={perfil?.id} hidden></div>
+</BaseLayout>
+
+<style>
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+  .topbar__sub { margin: 0; color: var(--color-text-secondary); font-size: 0.85rem; }
+  .topbar__title { margin: 0; font-size: 1.8rem; font-weight: 600; }
+
+  .card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .card__header { display: flex; justify-content: space-between; align-items: center; }
+  .card__title { margin: 0; font-size: 1.1rem; font-weight: 500; }
+
+  .badge { font-size: 0.75rem; color: var(--color-text-secondary); background: var(--color-background-secondary); padding: 0.25rem 0.75rem; border-radius: 999px; }
+
+  .foto-row { display: flex; align-items: center; gap: 1.5rem; }
+  .foto-circle { width: 96px; height: 96px; border-radius: 50%; overflow: hidden; border: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+  .foto-circle img { width: 100%; height: 100%; object-fit: cover; }
+  .foto-circle__placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 0.75rem; color: var(--color-text-tertiary); background: var(--color-background-secondary); }
+  .foto-actions { display: flex; flex-direction: column; gap: 0.5rem; }
+  .hint { font-size: 0.75rem; color: var(--color-text-tertiary); }
+
+  .form-grid { display: grid; gap: 1rem; }
+  .form-grid--2 { grid-template-columns: 1fr 1fr; }
+  .form-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field label { font-size: 0.85rem; font-weight: 500; color: var(--color-text-secondary); }
+  .field input, .field textarea {
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    width: 100%;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--color-border-primary); }
+  .field textarea { resize: vertical; min-height: 90px; }
+
+  .form-footer { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; flex-wrap: wrap; }
+
+  .msg { font-size: 0.875rem; margin: 0; }
+  .msg--error { color: var(--color-text-danger); }
+  .msg--success { color: var(--color-text-success); }
+
+  .btn { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 0.5rem 1.1rem; font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.15s; background: transparent; color: var(--color-text-primary); }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn--primary { background: #2563eb; color: white; border-color: transparent; }
+  .btn--primary:hover { background: #1d4ed8; }
+  .btn--outline { border-color: var(--color-border-primary); }
+  .btn--danger { background: #dc2626; color: white; border-color: transparent; }
+  .btn--danger:hover { background: #b91c1c; }
+  .btn--ghost-danger { color: #dc2626; border-color: transparent; font-size: 0.85rem; padding: 0.4rem 0.8rem; }
+  .btn--ghost-danger:hover { background: #fee2e2; }
+
+  .form-add { display: flex; flex-direction: column; gap: 1rem; padding: 1.25rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); }
+
+  .item-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .item-card { display: flex; justify-content: space-between; align-items: flex-start; padding: 1rem 1.25rem; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); }
+  .item-card__info { display: flex; flex-direction: column; gap: 0.2rem; }
+  .item-card__info h3 { margin: 0; font-size: 0.95rem; font-weight: 500; }
+  .item-card__info p { margin: 0; font-size: 0.875rem; color: var(--color-text-secondary); }
+  .item-card__info small { font-size: 0.8rem; color: var(--color-text-tertiary); }
+  .item-card__desc { font-size: 0.85rem; color: var(--color-text-tertiary) !important; }
+  .item-card__link { font-size: 0.85rem; color: #2563eb; text-decoration: none; }
+  .item-card__link:hover { text-decoration: underline; }
+
+  .tags-list { flex-direction: row; flex-wrap: wrap; }
+  .item-tag { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--color-background-info); color: var(--color-text-info); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.875rem; }
+  .btn-tag-delete { background: none; border: none; cursor: pointer; color: inherit; font-size: 0.8rem; padding: 0; opacity: 0.7; }
+  .btn-tag-delete:hover { opacity: 1; }
+
+  .nivel-badge { font-size: 0.75rem; color: var(--color-text-secondary); background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); padding: 0.2rem 0.6rem; border-radius: 999px; }
+  .empty { font-size: 0.875rem; color: var(--color-text-tertiary); font-style: italic; }
+
+  @media (max-width: 700px) {
+    .form-grid--2, .form-grid--3 { grid-template-columns: 1fr; }
+    .foto-row { flex-direction: column; align-items: flex-start; }
+    .topbar { flex-direction: column; align-items: flex-start; }
+    .form-footer { justify-content: flex-start; }
+    .item-card { flex-direction: column; gap: 0.75rem; }
+  }
+</style>
+
+<script>
+  import api from "../lib/api";
+  import { actualizarPerfil } from "../lib/perfil";
+  import { crearIdioma, eliminarIdioma } from "../lib/idioma";
+  import { crearExperiencia, eliminarExperiencia } from "../lib/experiencias";
+  import { crearEducacion, eliminarEducacion } from "../lib/educacion";
+  import { crearHabilidad, eliminarHabilidad } from "../lib/habilidades";
+  import { crearProyecto, eliminarProyecto } from "../lib/proyectos";
+  import { crearCertificacion, eliminarCertificacion } from "../lib/certificaciones";
+
+  const idPerfil = parseInt(document.querySelector('[data-id-perfil]')?.dataset.idPerfil) || null;
+  let fotoSeleccionada = null;
+
+  /* LOGOUT */
+
+
+  /* FOTO */
+  const inputFoto = document.getElementById("input-foto");
+  document.getElementById("btn-seleccionar-foto")?.addEventListener("click", () => inputFoto.click());
+  inputFoto?.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Selecciona una imagen válida"); return; }
+    if (file.size > 5 * 1024 * 1024) { alert("La imagen debe ser menor a 5MB"); return; }
+    fotoSeleccionada = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const preview = document.getElementById("preview-foto");
+      if (preview.tagName === "IMG") {
+        preview.src = ev.target.result;
+      } else {
+        const img = document.createElement("img");
+        img.id = "preview-foto";
+        img.src = ev.target.result;
+        img.alt = "Foto de perfil";
+        preview.replaceWith(img);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* PERFIL */
+  document.getElementById("perfilForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const success = document.getElementById("success-perfil");
+    const error = document.getElementById("error-perfil");
+    success.textContent = "";
+    error.textContent = "";
+    try {
+      const formData = new FormData(e.target);
+      if (fotoSeleccionada) formData.append("foto_perfil", fotoSeleccionada);
+      await actualizarPerfil(formData);
+      success.textContent = "Perfil actualizado correctamente";
+      fotoSeleccionada = null;
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (err) {
+      error.textContent = err?.response?.data?.message || err.message || "Error al actualizar perfil";
+    }
+  });
+
+  /* AGREGAR AL DOM */
+  function agregarItemAlDOM(tipo, data) {
+    const lista = document.getElementById(`lista-${tipo}`);
+    if (!lista) return;
+    lista.querySelector(".empty")?.remove();
+
+    if (tipo === "habilidad") {
+      const tag = document.createElement("div");
+      tag.className = "item-tag";
+      tag.dataset.id = data.id;
+      tag.innerHTML = `
+        <span>${data.habilidad}</span>
+        <button class="btn-tag-delete btn-delete" data-type="habilidad" data-id="${data.id}">✕</button>
+      `;
+      lista.appendChild(tag);
+      return;
+    }
+
+    const templates = {
+      experiencia: (d) => `
+        <div class="item-card__info">
+          <h3>${d.descripcion_puesto}</h3>
+          <p>${d.nombre_empresa}</p>
+          ${d.direccion ? `<p>${d.direccion}</p>` : ""}
+          <small>${d.fecha_inicio || ""} — ${d.fecha_fin || "Actualidad"}</small>
+        </div>`,
+      educacion: (d) => `
+        <div class="item-card__info">
+          <h3>${d.titulo}</h3>
+          <p>${d.nombre_institucion}</p>
+          <small>${d.fecha_inicio || ""} — ${d.fecha_fin || "Actualidad"}</small>
+        </div>`,
+      proyecto: (d) => `
+        <div class="item-card__info">
+          <h3>${d.proyecto}</h3>
+          ${d.descripcion ? `<p class="item-card__desc">${d.descripcion}</p>` : ""}
+          ${d.url_proyecto ? `<a href="${d.url_proyecto}" target="_blank" class="item-card__link">Ver proyecto →</a>` : ""}
+          ${d.fecha_inicio ? `<small>${d.fecha_inicio} — ${d.fecha_fin || "En curso"}</small>` : ""}
+        </div>`,
+      certificacion: (d) => `
+        <div class="item-card__info">
+          <h3>${d.certificacion}</h3>
+          ${d.organizacion ? `<p>${d.organizacion}</p>` : ""}
+          ${d.fecha_emision ? `<small>Emitida: ${d.fecha_emision}</small>` : ""}
+        </div>`,
+      idioma: (d) => `
+        <div class="item-card__info">
+          <h3>${d.idioma}</h3>
+          ${d.nivel ? `<span class="nivel-badge">${d.nivel}</span>` : ""}
+        </div>`,
+    };
+
+    const div = document.createElement("div");
+    div.className = "item-card";
+    div.dataset.id = data.id;
+    div.innerHTML = `
+      ${templates[tipo](data)}
+      <button class="btn btn--ghost-danger btn-delete" data-type="${tipo}" data-id="${data.id}">Eliminar</button>
+    `;
+    lista.prepend(div);
+  }
+
+  /* FORMULARIOS AGREGAR */
+  document.querySelectorAll(".form-add").forEach((form) => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const tipo = form.dataset.type;
+      const btn = form.querySelector("button[type='submit']");
+      btn.disabled = true;
+      btn.textContent = "Guardando...";
+
+      try {
+        const data = Object.fromEntries(new FormData(form));
+
+        const handlers = {
+          idioma:        () => crearIdioma(data),
+          experiencia:   () => crearExperiencia(data),
+          educacion:     () => crearEducacion(data),
+          habilidad:     () => crearHabilidad(data),
+          proyecto:      () => crearProyecto(data),
+          certificacion: () => crearCertificacion(data),
+        };
+
+        const resultado = await handlers[tipo]?.();
+        if (resultado) {
+          agregarItemAlDOM(tipo, resultado);
+          form.reset();
+        }
+      } catch (err) {
+        alert(err?.response?.data?.message || "Error al agregar");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = `Agregar ${tipo}`;
+      }
+    });
+  });
+
+  /* ELIMINAR */
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".btn-delete, .btn-tag-delete");
+    if (!btn) return;
+
+    const tipo = btn.dataset.type;
+    const id = parseInt(btn.dataset.id);
+    if (!confirm(`¿Eliminar este ${tipo}?`)) return;
+
+    try {
+      const handlers = {
+        idioma:        () => eliminarIdioma(id),
+        experiencia:   () => eliminarExperiencia(id),
+        educacion:     () => eliminarEducacion(id),
+        habilidad:     () => eliminarHabilidad(id),
+        proyecto:      () => eliminarProyecto(id),
+        certificacion: () => eliminarCertificacion(id),
+      };
+
+      await handlers[tipo]?.();
+
+      btn.closest(".item-card, .item-tag")?.remove();
+
+      const lista = document.getElementById(`lista-${tipo}`);
+      if (lista && !lista.querySelector(".item-card, .item-tag")) {
+        lista.innerHTML = `<p class="empty">No tienes ${tipo}s registrados.</p>`;
+      }
+    } catch (err) {
+      alert(err?.response?.data?.message || "Error al eliminar");
+    }
+  });
+</script>

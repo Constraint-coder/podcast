@@ -1,0 +1,744 @@
+---
+import { getUser } from "../../lib/auth-server"
+
+
+
+import BaseLayout from "../../layouts/LayoutNobar.astro";
+import Sidebar from "@/components/Sidebar.astro";
+
+import { getPublicaciones } from "../../lib/publicaciones-server";
+import { getPerfil } from "../../lib/perfil-server";
+
+
+const token = Astro.cookies.get("token")?.value;
+
+if (!token) {
+  throw Astro.redirect("/login");
+}
+
+const page = Number(Astro.url.searchParams.get("page")) || 1;
+const tema = Astro.url.searchParams.get("tema") || "";
+const perPage = 6;
+
+let user = null;
+  user = await getUser(token);
+
+let publicacionesRaw = [];
+let perfil = [];
+
+try {
+  const [pubRes, perfilRes] = await Promise.all([
+    getPublicaciones(token),
+    getPerfil(token)
+  ]);
+
+  publicacionesRaw = Array.isArray(pubRes?.data)
+    ? pubRes.data
+    : Array.isArray(pubRes)
+      ? pubRes
+      : [];
+
+  perfil = perfilRes;
+
+} catch (error) {
+  console.error(error);
+}
+
+// 🔥 asegurar array SI O SI
+const publicacionesArray = publicacionesRaw ?? [];
+
+// filtro seguro
+const filtradas = tema
+  ? publicacionesArray.filter((p) =>
+      (p.tema ?? "")
+        .toLowerCase()
+        .includes(tema.toLowerCase())
+    )
+  : publicacionesArray;
+
+// paginación
+const totalPages = Math.ceil(filtradas.length / perPage);
+
+const publicacionesPaginadas = filtradas.slice(
+  (page - 1) * perPage,
+  page * perPage
+);
+---
+
+<BaseLayout>
+  <section class="sidebar-area">
+  <Sidebar/>
+</section>
+
+
+  <section class="publicaciones">
+
+    <div class="header">
+
+      <div>
+        <h1>Publicaciones</h1>
+        <p>Explora temas y opiniones</p>
+      </div>
+
+      <form class="buscador">
+        <div class="input-box">
+          <input
+            type="text"
+            name="tema"
+            placeholder="Buscar tema..."
+            value={tema}
+          />
+          <button type="submit">🔍</button>
+        </div>
+
+        {tema && (
+          <a href="/publicaciones/publicaciones" class="limpiar">✕</a>
+        )}
+      </form>
+
+    </div>
+    <div class="card" >
+
+    {publicacionesPaginadas.length ? (
+      publicacionesPaginadas.map((pub) => (
+        <article class="card">
+          <div class="card-top">
+            {pub.tema && <span class="tema">#{pub.tema}</span>}
+            {pub.autor && <span class="autor">{pub.autor}</span>}
+          </div>
+
+          <a href={`/publicaciones/${pub.id}`} class="titulo">
+            {pub.titulo || "Sin título"}
+          </a>
+
+          {pub.contenido && (
+            <p class="contenido">{pub.contenido}</p>
+          )}
+        </article>
+      ))
+    ) : (
+      <div class="empty">
+        <h3>Sin resultados</h3>
+        <p>No encontramos publicaciones.</p>
+      </div>
+    )}
+
+    {totalPages > 1 && (
+      <div class="paginador">
+
+        {page > 1 && (
+          <a href={`?page=${page - 1}&tema=${tema}`}>←</a>
+        )}
+
+        {Array.from({ length: totalPages }).map((_, i) => (
+          <a
+            href={`?page=${i + 1}&tema=${tema}`}
+            class={page === i + 1 ? "active" : ""}
+          >
+            {i + 1}
+          </a>
+        ))}
+
+        {page < totalPages && (
+          <a href={`?page=${page + 1}&tema=${tema}`}>→</a>
+        )}
+
+      </div>
+    )}
+    </div>
+
+  </section>
+
+</BaseLayout>
+<style>
+.card{
+  margin-top: 60px;
+}
+.sidebar-area{
+
+  position:fixed;
+  width: 20%;
+margin:auto;
+  top:90px;
+
+  height:fit-content;
+
+  background:
+    rgba(255,255,255,.7);
+
+  backdrop-filter:blur(18px);
+
+  border:
+    1px solid rgba(255,255,255,.5);
+
+  border-radius:28px;
+
+  padding:1.2rem;
+
+  box-shadow:
+    0 10px 30px rgba(15,23,42,.06);
+}
+
+  .publicaciones{
+
+    max-width: 850px;
+  
+    margin: auto;
+
+    padding: 2.5rem 1.2rem;
+  }
+
+  /* HEADER */
+
+  .header{
+    position: fixed;
+    display:flex;
+    z-index: 100;
+    top:0;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:1.5rem;
+
+    flex-wrap:wrap;
+
+    margin-bottom:2.5rem;
+
+    background:
+      rgba(255,255,255,.7);
+
+    backdrop-filter: blur(14px);
+
+    border:1px solid rgba(255,255,255,.4);
+
+
+
+    border-radius:28px;
+
+    box-shadow: var(--shadow);
+  }
+
+  .header h1{
+
+    margin:0;
+
+    font-size:3.7rem;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+      );
+
+    -webkit-background-clip:text;
+
+    color:transparent;
+  }
+
+  .header p{
+
+    margin-top:.5rem;
+
+    color:var(--muted);
+
+    font-size:1.5rem;
+
+    line-height:1.6;
+  }
+
+  /* SEARCH */
+
+  .buscador{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:.8rem;
+  }
+
+  .input-box{
+
+    display:flex;
+
+    align-items:center;
+
+    background:var(--white);
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:
+      0 6px 20px rgba(15,23,42,.08);
+
+    transition:.25s ease;
+  }
+
+  .input-box:focus-within{
+
+    transform:translateY(-2px);
+
+    border-color:rgba(37,99,235,.35);
+
+    box-shadow:
+      0 12px 30px rgba(37,99,235,.12);
+  }
+
+  .input-box input{
+
+    border:none;
+
+    outline:none;
+
+    padding:1rem 1.1rem;
+
+    width:250px;
+
+    font-size:.95rem;
+
+    background:transparent;
+
+    color:var(--dark);
+  }
+
+  .input-box input::placeholder{
+
+    color:#94a3b8;
+  }
+
+  .input-box button{
+
+    border:none;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+      );
+
+    color:white;
+
+    height:100%;
+
+    padding:0 1.2rem;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+    transition:.25s ease;
+  }
+
+  .input-box button:hover{
+
+    filter:brightness(1.05);
+  }
+
+  .limpiar{
+
+    width:46px;
+
+    height:46px;
+
+    border-radius:16px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-decoration:none;
+
+    background:var(--dark);
+
+    color:white;
+
+    font-weight:700;
+
+    transition:.25s ease;
+
+    box-shadow:
+      0 6px 18px rgba(15,23,42,.15);
+  }
+
+  .limpiar:hover{
+
+    transform:translateY(-3px) scale(1.04);
+
+    background:#020617;
+  }
+
+  /* CARDS */
+
+  .card{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+      rgba(255,255,255,.85);
+
+    backdrop-filter: blur(14px);
+
+    border:1px solid rgba(255,255,255,.6);
+
+    border-radius:28px;
+
+    padding:1.5rem;
+
+    margin-bottom:1.3rem;
+
+    transition:.28s ease;
+
+    box-shadow:
+      0 10px 35px rgba(15,23,42,.06);
+  }
+
+  .card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:0;
+
+    width:100%;
+
+    height:5px;
+
+    background:
+      linear-gradient(
+        90deg,
+        var(--primary),
+        var(--secondary)
+      );
+  }
+
+  .card:hover{
+
+    transform:
+      translateY(-5px)
+      scale(1.01);
+
+    box-shadow:
+      0 20px 45px rgba(15,23,42,.12);
+  }
+
+  .card-top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:1rem;
+
+    margin-bottom:1rem;
+
+    flex-wrap:wrap;
+  }
+
+  .tema{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:.4rem;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(37,99,235,.14),
+        rgba(124,58,237,.14)
+      );
+
+    color:var(--primary);
+
+    padding:.45rem .95rem;
+
+    border-radius:999px;
+
+    font-size:.82rem;
+
+    font-weight:700;
+
+    border:1px solid rgba(37,99,235,.12);
+  }
+
+  .autor{
+
+    color:var(--muted);
+
+    font-size:.88rem;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:.35rem;
+  }
+
+  .titulo{
+
+    display:block;
+
+    font-size:1.45rem;
+
+    font-weight:800;
+
+    color:var(--dark);
+
+    text-decoration:none;
+
+    margin-bottom:.75rem;
+
+    line-height:1.3;
+
+    transition:.2s ease;
+  }
+
+  .titulo:hover{
+
+    color:var(--primary);
+  }
+
+  .contenido{
+
+    color:var(--text);
+
+    line-height:1.8;
+
+    font-size:.97rem;
+
+    overflow:hidden;
+
+    display:-webkit-box;
+
+    -webkit-line-clamp:3;
+
+    -webkit-box-orient:vertical;
+  }
+
+  /* FOOTER CARD */
+
+  .card-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:1.2rem;
+
+    padding-top:1rem;
+
+    border-top:1px solid var(--border);
+
+    flex-wrap:wrap;
+
+    gap:1rem;
+  }
+
+  .meta{
+
+    display:flex;
+
+    gap:1rem;
+
+    color:var(--muted);
+
+    font-size:.85rem;
+  }
+
+  .leer-mas{
+
+    text-decoration:none;
+
+    color:var(--primary);
+
+    font-weight:700;
+
+    transition:.2s ease;
+  }
+
+  .leer-mas:hover{
+
+    color:var(--secondary);
+
+    transform:translateX(2px);
+  }
+
+  /* PAGINADOR */
+
+  .paginador{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:.7rem;
+
+    margin-top:3rem;
+
+    flex-wrap:wrap;
+  }
+
+  .paginador a{
+
+    min-width:46px;
+
+    height:46px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:0 1rem;
+
+    border-radius:16px;
+
+    text-decoration:none;
+
+    background:rgba(255,255,255,.85);
+
+    color:var(--dark);
+
+    border:1px solid rgba(255,255,255,.5);
+
+    box-shadow:
+      0 6px 20px rgba(15,23,42,.06);
+
+    font-weight:700;
+
+    transition:.25s ease;
+  }
+
+  .paginador a:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+      0 12px 28px rgba(15,23,42,.12);
+  }
+
+  .paginador .active{
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+      );
+
+    color:white;
+
+    border:none;
+  }
+
+  /* EMPTY */
+
+  .empty{
+
+    text-align:center;
+
+    padding:5rem 2rem;
+
+    border-radius:28px;
+
+    background:rgba(255,255,255,.8);
+
+    backdrop-filter:blur(12px);
+
+    border:1px solid rgba(255,255,255,.5);
+
+    box-shadow:var(--shadow);
+  }
+
+  .empty h2{
+
+    margin-bottom:.7rem;
+
+    color:var(--dark);
+
+    font-size:2rem;
+  }
+
+  .empty p{
+
+    color:var(--muted);
+
+    max-width:500px;
+
+    margin:auto;
+
+    line-height:1.7;
+  }
+
+  /* RESPONSIVE */
+
+  @media (max-width:768px){
+
+    .header{
+
+      padding:1.3rem;
+    }
+
+    .header h1{
+
+      font-size:2rem;
+    }
+
+    .input-box input{
+
+      width:100%;
+    }
+
+    .buscador{
+
+      width:100%;
+    }
+
+    .input-box{
+
+      flex:1;
+    }
+
+    .card{
+
+      padding:1.2rem;
+    }
+
+    .titulo{
+
+      font-size:1.2rem;
+    }
+
+    .card-footer{
+
+      flex-direction:column;
+
+      align-items:flex-start;
+    }
+  }
+
+</style>

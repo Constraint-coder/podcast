@@ -1,0 +1,760 @@
+/* styles/curriculum.css - Estilo minimalista profesional */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #000;
+  background: #f5f5f5;
+}
+
+/* Layout principal con publicaciones a la izquierda */
+.main-layout {
+  display: grid;
+  grid-template-columns: 30% 1fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 30px auto;
+  padding: 0 20px;
+  align-items: start;
+}
+
+.curriculum-wrapper {
+  grid-column: 2;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  background: white;
+  border: 2px solid #ff8c00;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.volver:hover {
+  background: #ff8c00;
+  color: white;
+}
+
+.btn-descargar {
+  background: #ff8c00;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.btn-descargar:hover {
+  background: #e67e00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4);
+}
+
+/* Curriculum Container */
+.curriculum-container {
+  background: white;
+  border: 15px solid #ff8c00;
+  padding: 50px 60px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Header del CV - Título centrado */
+.cv-header {
+  text-align: center;
+  padding-bottom: 40px;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.cv-header h1.cv-titulo-principal {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  margin: 0;
+  color: #000;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Sección de info personal con foto */
+.cv-info-personal {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: start;
+  text-align: left;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.cv-datos-personales {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-datos-personales p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #000;
+}
+
+.cv-datos-personales strong {
+  font-weight: 600;
+}
+
+.cv-photo-container {
+  flex-shrink: 0;
+}
+
+.cv-photo,
+.cv-photo-placeholder {
+  width: 180px;
+  height: 240px;
+  object-fit: cover;
+  border: 3px solid #000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cv-photo-placeholder {
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 48px;
+  color: #999;
+  letter-spacing: 4px;
+}
+
+.cv-header-info {
+  flex: 1;
+}
+
+.cv-nombre {
+  font-size: 20px;
+  margin: 0 0 5px 0;
+  color: #000;
+  font-weight: 600;
+}
+
+.cv-titulo {
+  font-size: 16px;
+  color: #000;
+  margin: 0 0 15px 0;
+  font-weight: 400;
+}
+
+.cv-contacto {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.cv-contacto-item {
+  font-size: 13px;
+  color: #000;
+  line-height: 1.6;
+}
+
+.cv-enlaces {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.cv-enlaces a {
+  color: #000;
+  text-decoration: underline;
+  font-size: 13px;
+  transition: color 0.3s;
+}
+
+.cv-enlaces a:hover {
+  color: #ff8c00;
+}
+
+/* Secciones del CV */
+.cv-section {
+  margin-bottom: 35px;
+  page-break-inside: avoid;
+}
+
+.cv-section:last-child {
+  margin-bottom: 0;
+}
+
+.cv-section-title {
+  font-size: 16px;
+  color: #000;
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  font-weight: 700;
+  text-transform: none;
+  border-bottom: 2px solid #000;
+  letter-spacing: 0.5px;
+}
+
+.cv-sobre-mi {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #000;
+  text-align: justify;
+  margin: 0;
+}
+
+/* Items (Experiencia, Educación, etc) */
+.cv-item {
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+
+.cv-item:last-child {
+  margin-bottom: 0;
+}
+
+.cv-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+  gap: 15px;
+}
+
+.cv-item-title {
+  font-size: 15px;
+  color: #000;
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.cv-item-periodo {
+  font-size: 13px;
+  color: #000;
+  white-space: nowrap;
+  font-weight: 400;
+}
+
+.cv-item-empresa {
+  font-size: 14px;
+  color: #000;
+  margin: 0 0 8px 0;
+  font-weight: 400;
+}
+
+.cv-item-descripcion {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #000;
+  margin: 0;
+  text-align: justify;
+}
+
+.cv-proyecto-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: #000;
+  text-decoration: underline;
+  font-size: 13px;
+}
+
+.cv-proyecto-link:hover {
+  color: #ff8c00;
+}
+
+/* Lista con guiones */
+.cv-experiencia-lista,
+.cv-actividades-lista {
+  list-style: none;
+  padding-left: 20px;
+  margin: 15px 0 0 0;
+}
+
+.cv-experiencia-lista li,
+.cv-actividades-lista li {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #000;
+  margin-bottom: 8px;
+  position: relative;
+  text-align: justify;
+}
+
+.cv-experiencia-lista li::before,
+.cv-actividades-lista li::before {
+  content: '-';
+  position: absolute;
+  left: -15px;
+  font-weight: bold;
+}
+
+/* Habilidades */
+.cv-habilidades {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #000;
+  text-align: justify;
+}
+
+.cv-habilidad-tag {
+  display: inline;
+  background: none;
+  color: #000;
+  padding: 0;
+  border-radius: 0;
+  font-size: 13px;
+  font-weight: 400;
+  border: none;
+}
+
+/* Idiomas */
+.cv-idiomas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cv-idioma-item {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.cv-idioma-nombre {
+  display: inline;
+  font-size: 13px;
+  font-weight: 600;
+  color: #000;
+  margin-right: 8px;
+}
+
+.cv-idioma-nivel {
+  display: inline;
+  font-size: 13px;
+  color: #000;
+  font-weight: 400;
+}
+
+/* Publicaciones - Sidebar izquierdo (30%) */
+.publicaciones-wrapper {
+  grid-column: 1;
+  grid-row: 1;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.publicaciones-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.publicaciones-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.publicaciones-wrapper::-webkit-scrollbar-thumb {
+  background: #ff8c00;
+  border-radius: 10px;
+}
+
+.publicaciones-titulo {
+  font-size: 18px;
+  color: #000;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  font-weight: 700;
+  border-bottom: 2px solid #ff8c00;
+}
+
+.publicaciones-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.no-publicaciones {
+  text-align: center;
+  color: #666;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 4px;
+  font-style: italic;
+  border: 2px solid #e0e0e0;
+  font-size: 12px;
+}
+
+.publicacion-card {
+  background: white;
+  padding: 12px;
+  border-radius: 4px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+  font-size: 12px;
+}
+
+.publicacion-card:hover {
+  border-color: #ff8c00;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.15);
+}
+
+.publicacion-card h1 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #000;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.publicacion-card > p {
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+  color: #000;
+  font-size: 11px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.publicacion-card img {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.stats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-comentarios,
+.btn-like {
+  background: white;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  font-size: 11px;
+  color: #000;
+  transition: all 0.3s;
+  padding: 4px 8px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.btn-comentarios:hover,
+.btn-like:hover {
+  border-color: #ff8c00;
+  color: #ff8c00;
+}
+
+.comentarios-count,
+.like-count {
+  font-weight: 700;
+  font-size: 10px;
+}
+
+.like-icon {
+  font-size: 14px;
+}
+
+/* Sección de comentarios en publicaciones pequeñas */
+.comentarios-section {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.comentarios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.comentarios-lista::-webkit-scrollbar {
+  width: 4px;
+}
+
+.comentarios-lista::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.comentarios-lista::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.comentario-item {
+  background: #f8f9fa;
+  padding: 6px 8px;
+  border-radius: 3px;
+  border-left: 2px solid #ff8c00;
+  transition: all 0.2s;
+}
+
+.comentario-item:hover {
+  background: #f0f0f0;
+}
+
+.comentario-item strong {
+  color: #000;
+  display: block;
+  margin-bottom: 3px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.comentario-item p {
+  margin: 0;
+  color: #333;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.form-comentario {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.nuevo-comentario {
+  flex: 1;
+}
+
+.input-comentario {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  font-size: 10px;
+  transition: all 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 40px;
+}
+
+.input-comentario:focus {
+  outline: none;
+  border-color: #ff8c00;
+}
+
+.input-comentario::placeholder {
+  color: #999;
+  font-size: 10px;
+}
+
+.enviar-comentario {
+  padding: 6px 12px;
+  background: #ff8c00;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-weight: 600;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+  align-self: flex-end;
+}
+
+.enviar-comentario:hover {
+  background: #e67e00;
+}
+
+.enviar-comentario:active {
+  transform: translateY(1px);
+}
+
+.enviar-comentario:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cargar-mas {
+  width: 100%;
+  padding: 6px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  color: #000;
+  font-size: 10px;
+}
+
+.btn-cargar-mas:hover {
+  background: #f8f9fa;
+  border-color: #ff8c00;
+  color: #ff8c00;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .curriculum-wrapper {
+    grid-column: 1;
+  }
+
+  .publicaciones-wrapper {
+    grid-column: 1;
+    grid-row: 2;
+    position: relative;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    padding: 15px;
+  }
+
+  .curriculum-container {
+    padding: 30px 25px;
+    border-width: 10px;
+  }
+
+  .cv-header h1.cv-titulo-principal {
+    font-size: 32px;
+    letter-spacing: 4px;
+  }
+
+  .cv-info-personal {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 25px;
+  }
+
+  .cv-photo-container {
+    margin: 0 auto;
+  }
+
+  .cv-photo,
+  .cv-photo-placeholder {
+    width: 150px;
+    height: 200px;
+  }
+
+  .cv-datos-personales {
+    align-items: center;
+  }
+
+  .cv-section-title {
+    font-size: 15px;
+  }
+
+  .cv-item-header {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+  }
+
+  .cv-item-periodo {
+    white-space: normal;
+  }
+
+  .publicacion-card {
+    padding: 15px;
+    font-size: 13px;
+  }
+
+  .publicacion-card h1 {
+    font-size: 16px;
+  }
+
+  .publicacion-card > p {
+    font-size: 12px;
+  }
+}
+
+/* Modo impresión */
+@media print {
+  .volver,
+  .btn-descargar,
+  .publicaciones-wrapper {
+    display: none !important;
+  }
+
+  .main-layout {
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  .curriculum-wrapper {
+    margin: 0;
+    padding: 0;
+  }
+
+  .curriculum-container {
+    box-shadow: none;
+    page-break-after: auto;
+  }
+
+  .cv-section {
+    page-break-inside: avoid;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .curriculum-container {
+    border-color: #ff8c00 !important;
+  }
+}
