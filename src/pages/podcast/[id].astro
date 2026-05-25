@@ -1,0 +1,141 @@
+---
+import BaseLayout from "../../layouts/Layout.astro";
+
+import Navbar from "../../components/navbar/navbar.astro";
+import PodcastCard from "../../components/podcast/podcast.astro";
+
+import { getUser } from "../../lib/auth-server";
+import { getPerfil } from "../../lib/perfil-server";
+
+import {
+  getPodcast
+} from "../../lib/podcast-server";
+import "../../styles/global.css";
+
+const token = Astro.cookies.get("token")?.value;
+
+if (!token) {
+  throw Astro.redirect("/login");
+}
+
+const { id } = Astro.params;
+
+let podcast = null;
+let perfil = null;
+let user = null;
+
+try {
+
+  user = await getUser(token);
+
+  perfil = await getPerfil(token);
+
+  podcast = await getPodcast(
+    token,
+    id
+  );
+
+} catch (error) {
+
+  console.error(error);
+
+  throw Astro.redirect("/dashboard");
+}
+
+if (!podcast) {
+  throw Astro.redirect("/dashboard");
+}
+---
+
+<BaseLayout>
+
+  <Navbar {...perfil} />
+
+  <div class="dashboard-container">
+
+    <main class="main-content">
+
+      <div class="detalle-podcast">
+
+        <div class="volver-container">
+
+          <a
+            href="/dashboard"
+            class="btn-volver"
+          >
+            ← Volver
+          </a>
+
+        </div>
+
+        <div
+          class="podcast-wrapper"
+          data-wrapper-id={podcast.id}
+        >
+
+          <PodcastCard
+            {...podcast}
+          />
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</BaseLayout>
+
+<style>
+
+  .detalle-podcast {
+
+    width: 100%;
+
+    max-width: 800px;
+
+    margin: 0 auto;
+
+    padding: 20px;
+  }
+
+  .volver-container {
+
+    margin-bottom: 20px;
+  }
+
+  .btn-volver {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    text-decoration: none;
+
+    padding: 10px 16px;
+
+    border-radius: 10px;
+
+    background: #f3f3f3;
+
+    color: #111;
+
+    font-weight: 600;
+
+    transition: .2s ease;
+  }
+
+  .btn-volver:hover {
+
+    background: #ddd;
+  }
+
+  .podcast-wrapper {
+
+    position: relative;
+  }
+
+</style>

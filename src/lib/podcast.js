@@ -31,15 +31,17 @@ export async function getPodcastById(id) {
  * @returns {Promise<Podcast>}
  */
 export async function createPodcast(data) {
-  const formData = new FormData();
-  for (const [key, value] of Object.entries(data)) {
-    formData.append(key, value);
+
+  try {
+    const response = await api.post("/podcast", data)
+  return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.message ||
+      "Error al crear el podcast"
+    );
   }
 
-  const response = await api.post("/podcast", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return response.data;
 }
 
 /**

@@ -1,4 +1,4 @@
-// lib/publicaciones-server.js
+// lib/podcast-server.js
 
 import api from "@/lib/api";
 
@@ -17,25 +17,22 @@ function handleError(error, defaultMessage) {
 
 // ======================================
 // OBTENER FEED
-// GET /api/publicaciones
+// GET /api/podcast
 // ======================================
 export async function getFeed(token) {
-  return getPublicaciones(token);
+  return getPodcast(token);
 }
 
 // ======================================
 // OBTENER PUBLICACIONES
 // ======================================
-export async function getPublicaciones(token, page = 1) {
+export async function getPodcast(token) {
   try {
     const { data } = await api.get(
-      "/publicaciones",
+      "/podcast",
       {
         headers: {
           Authorization: `Bearer ${token}`,
-        },
-        params: {
-          page,
         },
       }
     );
@@ -45,7 +42,7 @@ export async function getPublicaciones(token, page = 1) {
   } catch (error) {
     handleError(
       error,
-      "Error al obtener publicaciones"
+      "Error al obtener podcast"
     );
   }
 }
@@ -53,10 +50,10 @@ export async function getPublicaciones(token, page = 1) {
 // ======================================
 // OBTENER MIS PUBLICACIONES
 // ======================================
-export async function mePublicacion(token) {
+export async function mePodcast(token) {
   try {
     const { data } = await api.get(
-      "/publicaciones/me",
+      "/podcast/me",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +66,7 @@ export async function mePublicacion(token) {
   } catch (error) {
     handleError(
       error,
-      "Error al obtener publicaciones"
+      "Error al obtener podcast"
     );
   }
 }
@@ -77,13 +74,13 @@ export async function mePublicacion(token) {
 // ======================================
 // OBTENER PUBLICACIONES POR AUTOR
 // ======================================
-export async function getPublicacionesPorAutor(
+export async function getPodcastPorAutor(
   token,
   idAutor
 ) {
   try {
     const { data } = await api.get(
-      `/publicaciones/autor/${idAutor}`,
+      `/podcast/autor/${idAutor}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,14 +92,14 @@ export async function getPublicacionesPorAutor(
 
   } catch (error) {
 
-    // Si no hay publicaciones
+    // Si no hay podcast
     if (error?.response?.status === 404) {
       return [];
     }
 
     handleError(
       error,
-      "Error al obtener publicaciones del autor"
+      "Error al obtener podcast del autor"
     );
   }
 }
@@ -110,13 +107,13 @@ export async function getPublicacionesPorAutor(
 // ======================================
 // OBTENER PUBLICACION POR ID
 // ======================================
-export async function getPublicacion(
+export async function getPodcastById(
   token,
-  idPublicacion
+  idPodcast
 ) {
   try {
     const { data } = await api.get(
-      `/publicaciones/${idPublicacion}`,
+      `/podcast/${idPodcast}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -137,13 +134,13 @@ export async function getPublicacion(
 // ======================================
 // CREAR PUBLICACION
 // ======================================
-export async function crearPublicacion(
+export async function crearPodcast(
   token,
   payload
 ) {
   try {
     const { data } = await api.post(
-      "/publicaciones",
+      "/podcast",
       payload,
       {
         headers: {
@@ -165,14 +162,14 @@ export async function crearPublicacion(
 // ======================================
 // ACTUALIZAR PUBLICACION
 // ======================================
-export async function actualizarPublicacion(
+export async function actualizarPodcast(
   token,
-  idPublicacion,
+  idPodcast,
   payload
 ) {
   try {
     const { data } = await api.put(
-      `/publicaciones/${idPublicacion}`,
+      `/podcast/${idPodcast}`,
       payload,
       {
         headers: {
@@ -194,13 +191,13 @@ export async function actualizarPublicacion(
 // ======================================
 // ELIMINAR PUBLICACION
 // ======================================
-export async function eliminarPublicacion(
+export async function eliminarPodcast(
   token,
-  idPublicacion
+  idPodcast
 ) {
   try {
     const { data } = await api.delete(
-      `/publicaciones/${idPublicacion}`,
+      `/podcast/${idPodcast}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

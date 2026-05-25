@@ -5,19 +5,19 @@ from "../../../layouts/Layout.astro";
 import Navbar
 from "../../../components/navbar/navbar.astro";
 
-import PublicacionCard
-from "../../../components/publicaciones/publicaciones.astro";
+import PodcastCard
+from "../../../components/podcast/podcast.astro";
 
-import Editarpublicaciones
-from "@/components/publicaciones/editarpublicaciones.astro";
+import Editarpodcast
+from "@/components/podcast/editarpodcast.astro";
 
 import {
   getPerfilPorId
 } from "../../../lib/perfil-server";
 
 import {
-  getPublicacionesPorAutor
-} from "../../../lib/publicaciones-server";
+  getPodcastPorAutor
+} from "../../../lib/podcast-server";
 
 import {
   getUser
@@ -35,7 +35,7 @@ if (!token) {
 const { id } = Astro.params;
 
 let perfil = null;
-let publicaciones = [];
+let podcast = [];
 let authUser = null;
 
 try {
@@ -48,10 +48,9 @@ try {
       token,
       id
     );
-    console.log("Perfil:", perfil);
 
-  publicaciones =
-    await getPublicacionesPorAutor(
+  podcast =
+    await getPodcastPorAutor(
       token,
       id
     );
@@ -135,13 +134,18 @@ const esMiPerfil =
 
       <div class="autor-actions">
 
-
+        <a
+          class="btn"
+          href={`/usuario/${id}`}
+        >
+          👤 Ver perfil
+        </a>
 
         <a
           class="btn secondary"
           href="/dashboard"
         >
-          ← Inicio
+          ← Volver
         </a>
 
       </div>
@@ -152,12 +156,12 @@ const esMiPerfil =
     <!-- PUBLICACIONES -->
     <!-- ========================= -->
 
-    <main class="publicaciones-grid">
+    <main class="podcast-grid">
 
       {
-        Array.isArray(publicaciones)
-        && publicaciones.length > 0
-          ? publicaciones.map((pub) => (
+        Array.isArray(podcast)
+        && podcast.length > 0
+          ? podcast.map((pub) => (
 
             <div
               class="publicacion-wrapper"
@@ -166,13 +170,13 @@ const esMiPerfil =
 
               {
                 esMiPerfil && (
-                  <Editarpublicaciones
+                  <Editarpodcast
                     {...pub}
                   />
                 )
               }
 
-              <PublicacionCard
+              <PodcastCard
                 {...pub}
               />
 
@@ -183,7 +187,7 @@ const esMiPerfil =
             <div class="empty">
 
               <h2>
-                Sin publicaciones
+                Sin podcast
               </h2>
 
               <p>

@@ -21,11 +21,14 @@ try {
 }
 ---  
 <BaseLayout>
+  <div class="perfil-header">
+    <a class="btnEditar" href="/editarperfil">Editar perfil</a>
+    <button id="logoutBtn" class="btn btn--danger">Cerrar sesión</button>
+  </div>
   <div style="flex-direction: column;">
 
   <ProfileCard perfil={perfil} />
-    <a style="margin: 40px;" href="/editarperfil">Editar perfil</a>
-    <button id="logoutBtn" class="btn btn--danger">volver</button>
+
 </div>
 <script>
   import { logout } from "@/lib/auth";
@@ -36,6 +39,25 @@ try {
   });
 </script>
 <style>
-  .btn--danger { background: #dc2626; color: white; border-color: transparent; }
+.btnEditar {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+ margin-right: 1rem;
+  text-decoration: none;
+}
+.perfil-header {
+       max-width: 960px;
+       margin: 0 auto;
+      display: flex;
+      z-index: 100;
+      position: relative;
+
+
+  }
+  .btn--danger { position: absolute; background: #dc2626; color: white; border-color: red; right: 3px; }
 </style>
 </BaseLayout>

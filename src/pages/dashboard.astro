@@ -1,39 +1,19 @@
 ---
 import BaseLayout from "../layouts/Layout.astro";
-import { getUser } from "../lib/auth-server";
-import { getPublicaciones } from "../lib/publicaciones-server";
-
-import PublicacionCard from "../components/publicaciones/publicaciones.astro";
-import CrearPublicacion from "../components/publicaciones/crearpublicaciones.astro";
 import Navbar from "@/components/navbar/navbar.astro";
 import Sidebar from "@/components/Sidebar.astro";
+import PublicacionesView from "@/views/publicaciones/PublicacionesView.astro";
+import PodcastView from "@/views/podcast/PodcastView.astro";
+import { getUser } from "@/lib/auth-server";
 
-import "../styles/global.css";
+const token =
+  Astro.cookies.get("token")?.value;
 
-const token = Astro.cookies.get("token")?.value;
-if (!token) {
-  
-return;
-   
-}
+if (!token)
+  return Astro.redirect("/login");
 
-const page = Number(
-  Astro.url.searchParams.get("page") || 1
-);
-
-let initialData;
-let user = null;
-
-try {
-
-  initialData =
-    await getPublicaciones(token, page);
-
-  user = await getUser(token);
-
-} catch (error) {
-  console.error(error);
-}
+const user =
+  await getUser(token);
 ---
 
 <BaseLayout>
@@ -42,467 +22,356 @@ try {
   <div class="navbar-fixed">
     <Navbar {...user} />
   </div>
-    <aside class="sidebar-area">
-      <Sidebar />
-    </aside>
 
-  <!-- DASHBOARD -->
-  <div class="dashboard-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar-area">
+    <Sidebar />
+  </aside>
 
-    <!-- SIDEBAR -->
+  <!-- CHATBOT -->
+  <aside class="chatbot-area">
 
-    <!-- CONTENIDO -->
-    <main class="main-content">
+   aqui va el chatbot
 
-      <section class="crear-publicacion-card">
 
-        <div class="section-header">
-          <h2>Crear publicación</h2>
-         
-        </div>
 
-        <CrearPublicacion />
+  </aside>
 
-      </section>
+  <!-- MAIN -->
+  <main class="dashboard">
 
-      <!-- FEED -->
-      <section class="feed-section">
+    <!-- TABS -->
+    <div class="tabs">
 
-        <div class="section-header">
-          <h2>Feed de publicaciones</h2>
+      <button
+        class="tab active"
+        data-view="publicaciones"
+      >
+        Publicaciones
+      </button>
 
-          <span>
-            {initialData.total}
-            publicaciones encontradas
-          </span>
-        </div>
+      <button
+        class="tab"
+        data-view="podcast"
+      >
+        Podcast
+      </button>
 
-        <div class="feed">
+    </div>
 
-          {Array.isArray(initialData.data) &&
-          initialData.data.length > 0 ? (
+    <!-- VISTAS -->
 
-            initialData.data.map((pub) => (
+    <div
+      class="view active"
+      id="publicaciones-view"
+    >
+      <PublicacionesView />
+    </div>
 
-              <div
-                class="publicacion-wrapper"
-                data-wrapper-id={pub.id}
-              >
-                <PublicacionCard {...pub} />
-              </div>
+    <div
+      class="view"
+      id="podcast-view"
+    >
+      <PodcastView />
+    </div>
 
-            ))
-
-          ) : (
-
-            <div class="empty-feed">
-
-              <h3>
-                No hay publicaciones aún
-              </h3>
-
-              <p>
-                Sé el primero en publicar algo.
-              </p>
-
-            </div>
-
-          )}
-
-        </div>
-
-        <!-- PAGINACION -->
-        <div class="paginacion">
-
-          {initialData.current_page > 1 && (
-            <a
-              class="btn-pag"
-              href={`?page=${initialData.current_page - 1}`}
-            >
-              ← Anterior
-            </a>
-          )}
-
-          <span class="info-pag">
-            Página
-            {initialData.current_page}
-            de
-            {initialData.last_page}
-          </span>
-
-          {initialData.current_page <
-            initialData.last_page && (
-            <a
-              class="btn-pag"
-              href={`?page=${initialData.current_page + 1}`}
-            >
-              Siguiente →
-            </a>
-          )}
-
-        </div>
-
-      </section>
-      
-
-    </main>
-
-  </div>
-
-<section class="seccion-lateral">
-<h1> aqui va el chat bot</h1>
-<h1> aqui va el chat bot</h1>
-<h1> aqui va el chat bot</h1>
-<h1> aqui va el chat bot</h1>
-</section>
+  </main>
 
 </BaseLayout>
 
+<script>
+
+  document
+    .querySelectorAll(".tab")
+    .forEach((tab) => {
+
+      tab.addEventListener(
+        "click",
+        () => {
+
+          const view =
+            tab.dataset.view;
+
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) =>
+              t.classList.remove("active")
+            );
+
+          document
+            .querySelectorAll(".view")
+            .forEach((v) =>
+              v.classList.remove("active")
+            );
+
+          tab.classList.add("active");
+
+          document
+            .getElementById(
+              `${view}-view`
+            )
+            ?.classList.add("active");
+        }
+      );
+    });
+
+</script>
+
 <style>
 
-:root{
+  :root{
 
-  --primary:#2563eb;
+    --primary:#2563eb;
 
-  --secondary:#7c3aed;
+    --secondary:#7c3aed;
 
-  --dark:#0f172a;
+    --dark:#0f172a;
 
-  --text:#334155;
+    --muted:#64748b;
 
-  --muted:#64748b;
-
-  --border:#e2e8f0;
-
-  --bg:#f1f5f9;
-
-  --white:#ffffff;
-}
-
-/* FONDO */
-
-body{
-
-  background:
-    linear-gradient(
-      180deg,
-      #f8fafc 0%,
-      #eef2ff 100%
-    );
-
-  min-height:100vh;
-}
-
-/* NAVBAR */
-
-.navbar-fixed{
-
-  position:fixed;
-
-  top:0;
-
-  z-index:999;
-
-  width:100%;
-  height: 40px;
-
-  backdrop-filter:blur(16px);
-
-  background:
-    rgba(255,255,255,.78);
-
-  border-bottom:
-    1px solid rgba(226,232,240,.8);
-}
-
-/* LAYOUT */
-
-.dashboard-layout{
-
-  display:grid;
-
-  grid-template-columns:
-  100%
-  2fr
-  ;
-
-  gap:2rem;
-
-  width:55%;
-
-  max-width:1400px;
-
-  margin:auto;
-
-  padding:
-    2rem
-    1.5rem;
-
-  align-items:start;
-}
-
-/* SIDEBAR */
-
-.sidebar-area{
-
-  position:fixed;
-  width: 20%;
-margin:auto;
-  top:90px;
-
-  height:fit-content;
-
-  background:
-    rgba(255,255,255,.7);
-
-  backdrop-filter:blur(18px);
-
-  border:
-    1px solid rgba(255,255,255,.5);
-
-  border-radius:28px;
-
-  padding:1.2rem;
-
-  box-shadow:
-    0 10px 30px rgba(15,23,42,.06);
-}
-
-/* MAIN */
-
-.main-content{
-
-  width:100%;
-}
-
-/* HERO */
-
-
-
-
-
-
-
-
-/* SECCIONES */
-
-.crear-publicacion-card,
-.feed-section{
-
-  background:
-    rgba(255,255,255,.78);
-
-  backdrop-filter:blur(18px);
-
-  border:
-    1px solid rgba(255,255,255,.5);
-
-  border-radius:28px;
-
-  padding:2.6rem;
-
-  margin-bottom:1.8rem;
-  margin-top: 10px;
-
-  box-shadow:
-    0 10px 30px rgba(15,23,42,.05);
-    
-}
-
-/* HEADER SECCIONES */
-
-.section-header{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:center;
-
-  gap:1rem;
-
-  flex-wrap:wrap;
-
-  margin-bottom:1.4rem;
-  align-items: center;
-}
-
-.section-header h2{
-
-  margin:0;
-
-  font-size:2.35rem;
-
-  color:var(--dark);
-
-  font-weight:800;
-  text-align: center;
-
-}
-
-
-/* FEED */
-
-.feed{
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:1.2rem;
-}
-
-.publicacion-wrapper{
-
-  animation:
-    fadeIn .35s ease;
-}
-.seccion-lateral{
-  top: 180px;
-  position: fixed;
-  width:20%;
-  display: grid;
-  flex-direction: column ;
-  margin: auto;
-  border:#0f172a solid 2px;
-  right: 1px;
-}
-@keyframes fadeIn{
-
-  from{
-
-    opacity:0;
-
-    transform:
-      translateY(10px);
+    --border:#e2e8f0;
   }
 
-  to{
+  body{
 
-    opacity:1;
+    margin:0;
 
-    transform:
-      translateY(0);
+    background:
+      linear-gradient(
+        180deg,
+        #f8fafc 0%,
+        #eef2ff 100%
+      );
+
+    font-family:
+      Inter,
+      system-ui,
+      sans-serif;
   }
-}
 
-/* EMPTY */
+  /* NAVBAR */
 
-.empty-feed{
+  .navbar-fixed{
 
-  text-align:center;
+    position:fixed;
 
-  padding:4rem 1rem;
-}
+    top:0;
 
-.empty-feed h3{
+    width:100%;
 
-  margin-bottom:.5rem;
+    z-index:1000;
 
-  color:var(--dark);
-}
+    background:
+      rgba(255,255,255,.85);
 
-.empty-feed p{
+    backdrop-filter:blur(16px);
 
-  color:var(--muted);
-}
-
-/* PAGINACION */
-
-.paginacion{
-
-  display:flex;
-
-  justify-content:center;
-
-  align-items:center;
-
-  gap:1rem;
-
-  flex-wrap:wrap;
-
-  margin-top:2rem;
-}
-
-.btn-pag{
-
-  padding:
-    .9rem
-    1.3rem;
-
-  border-radius:16px;
-
-  text-decoration:none;
-
-  color:white;
-
-  font-weight:700;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--primary),
-      var(--secondary)
-    );
-
-  box-shadow:
-    0 10px 25px rgba(37,99,235,.2);
-
-  transition:.25s ease;
-}
-
-.btn-pag:hover{
-
-  transform:
-    translateY(-3px);
-
-  box-shadow:
-    0 18px 30px rgba(37,99,235,.3);
-}
-
-.info-pag{
-
-  color:var(--muted);
-
-  font-weight:600;
-}
-
-/* RESPONSIVE */
-
-@media (max-width:1100px){
-
-  .dashboard-layout{
-
-    grid-template-columns:1fr;
+    border-bottom:
+      1px solid rgba(226,232,240,.7);
   }
+
+  /* SIDEBAR */
 
   .sidebar-area{
 
+    position:fixed;
+
+    top:90px;
+
+    left:18px;
+
+    width:220px;
+
+    z-index:50;
+  }
+
+  /* DASHBOARD */
+
+  .dashboard{
+
+    max-width:860px;
+
+    margin:auto;
+
+    padding:
+      100px
+      1.5rem
+      4rem;
+  }
+
+  /* TABS */
+
+  .tabs{
+
+    display:flex;
+
+    gap:.5rem;
+
+    margin-bottom:2rem;
+
+    padding:.4rem;
+
+    border-radius:18px;
+
+    background:
+      rgba(255,255,255,.75);
+
+    backdrop-filter:blur(14px);
+
+    border:
+      1px solid rgba(255,255,255,.5);
+
+    box-shadow:
+      0 10px 30px rgba(15,23,42,.05);
+  }
+
+  .tab{
+
+    flex:1;
+
     position:relative;
 
-    top:0;
+    padding:
+      1rem
+      1.4rem;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:none;
+
+    cursor:pointer;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+    color:#64748b;
+
+    transition:.25s ease;
   }
-}
 
-@media (max-width:768px){
+  .tab:hover{
 
-  .dashboard-layout{
+    color:#0f172a;
 
-    padding:1rem;
+    background:
+      rgba(241,245,249,.9);
   }
 
+  .tab.active{
 
+    color:white;
 
-  .crear-publicacion-card,
-  .feed-section{
+    background:
+      linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+      );
 
-    padding:1.2rem;
+    box-shadow:
+      0 10px 25px rgba(37,99,235,.2);
   }
 
-  .section-header{
+  /* VIEWS */
 
-    align-items:flex-start;
+  .view{
+
+    display:none;
   }
-}
+
+  .view.active{
+
+    display:block;
+
+    animation:
+      fadein .25s ease;
+  }
+
+  @keyframes fadein{
+
+    from{
+
+      opacity:0;
+
+      transform:
+        translateY(10px);
+    }
+
+    to{
+
+      opacity:1;
+
+      transform:
+        translateY(0);
+    }
+  }
+
+  /* CHATBOT */
+
+  .chatbot-area{
+
+    position:fixed;
+
+    top:90px;
+
+    right:20px;
+
+    width:320px;
+
+    z-index:100;
+  }
+
+  
+
+  /* RESPONSIVE */
+
+  @media (max-width:1400px){
+
+    .chatbot-area{
+
+      width:280px;
+    }
+  }
+
+  @media (max-width:1200px){
+
+    .chatbot-area{
+
+      display:none;
+    }
+
+    .dashboard{
+
+      max-width:820px;
+    }
+  }
+
+  @media (max-width:768px){
+
+    .sidebar-area{
+
+      display:none;
+    }
+
+    .dashboard{
+
+      width:95%;
+
+      padding:
+        90px
+        1rem
+        3rem;
+    }
+
+    .tab{
+
+      font-size:.85rem;
+
+      padding:.9rem;
+    }
+  }
 
 </style>
