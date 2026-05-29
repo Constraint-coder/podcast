@@ -41,7 +41,7 @@ try {
 
   throw Astro.redirect("/dashboard");
 }
-
+console.log("Publicacion:", publicacion);
 if (!publicacion) {
   throw Astro.redirect("/dashboard");
 }
@@ -49,7 +49,7 @@ if (!publicacion) {
 
 <BaseLayout>
 
-  <Navbar {...perfil} />
+  <Navbar {...user} />
 
   <div class="dashboard-container">
 
@@ -72,6 +72,7 @@ if (!publicacion) {
           class="publicacion-wrapper"
           data-wrapper-id={publicacion.id}
         >
+        {publicacion.imagen}
 
           <PublicacionCard
             {...publicacion}
@@ -135,7 +136,7 @@ if (!publicacion) {
 
   .publicacion-wrapper {
 
-    position: relative;
+    position: absolute;
   }
 
 </style>
